@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApi", "TestApi\TestApi.csproj", "{AF6BABD6-B6C4-431F-9A30-9DFC128F1C63}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FogBugzApi", "..\Fogger\FogBugzApi\FogBugzApi.csproj", "{02ACA6A8-EA7C-45BE-B8E2-689CB7BC6238}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF6BABD6-B6C4-431F-9A30-9DFC128F1C63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6BABD6-B6C4-431F-9A30-9DFC128F1C63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6BABD6-B6C4-431F-9A30-9DFC128F1C63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6BABD6-B6C4-431F-9A30-9DFC128F1C63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02ACA6A8-EA7C-45BE-B8E2-689CB7BC6238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02ACA6A8-EA7C-45BE-B8E2-689CB7BC6238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02ACA6A8-EA7C-45BE-B8E2-689CB7BC6238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02ACA6A8-EA7C-45BE-B8E2-689CB7BC6238}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {447C3BE4-B543-4DB1-B9ED-B86F432186E3}
+	EndGlobalSection
+EndGlobal
