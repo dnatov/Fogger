@@ -10,8 +10,8 @@ namespace FogBugzApi
     public class FogBugzApiWrapper
     {
         private static readonly HttpClient _client = new HttpClient();
-        private static int _version;
-        private static int _minVersion;
+        private static int _version = -1;
+        private static int _minVersion = -1;
         private static string _url;
         private static string _mainUri;
         private static string _token;
@@ -34,7 +34,7 @@ namespace FogBugzApi
         /// </summary>
         /// <param name="uri"></param>
         /// <returns></returns>
-        public static string PostWithoutContent(string uri)
+        private static string postWithoutContent(string uri)
         {
             //Use empty content
             var content = new FormUrlEncodedContent(
@@ -43,6 +43,18 @@ namespace FogBugzApi
                     {" "," "}
                 });
             return sendPost(uri, content);
+        }
+
+        /// <summary>
+        /// Uses existing Url and Token to POST with the command in cmd= and returns an xml response
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        private static XElement postAndGetXml(string command)
+        {
+            var post = postWithoutContent($"{Url}cmd={command}&token={_token}");
+
+            return XElement.Parse(post);
         }
 
         /// <summary>
@@ -55,7 +67,7 @@ namespace FogBugzApi
             _mainUri = uri;
 
             //Initial Post
-            var post = PostWithoutContent(uri + @"/api.xml");
+            var post = postWithoutContent(uri + @"/api.xml");
             //Store in XElement Obj
             var xml = XElement.Parse(post);
             //Parse HTML
@@ -73,7 +85,8 @@ namespace FogBugzApi
         /// <returns>Error Code</returns>
         public static int Logon(string user,string pass)
         {
-            var post = PostWithoutContent($"{Url}cmd=logon&email={user}&password=&pass");
+            //POST using other private method since this assume token is undefined
+            var post = postWithoutContent($"{Url}cmd=logon&email={user}&password=&pass");
 
             //Store in XElement Obj
             var xml = XElement.Parse(post);
@@ -100,6 +113,7 @@ namespace FogBugzApi
             Unknown,
             EmailPasswordMismatch,
             TwoFA,
+            InvalidToken,
             Ambiguous
         }
 
@@ -109,10 +123,8 @@ namespace FogBugzApi
         /// <returns></returns>
         public static bool ValidateLogon()
         {
-            var post = PostWithoutContent($"{Url}cmd=logon&token={_token}");
-
             //Store in XElement Obj
-            var xml = XElement.Parse(post);
+            var xml = postAndGetXml("logon");
 
             //Parse HTML for token. FogBugz recommends using this token as long as you can in favor of a new login request.
             var token = (xml.Elements().Where(x => x.Name.LocalName == "token").FirstOrDefault().Value);
@@ -122,6 +134,64 @@ namespace FogBugzApi
 
             //Logon is only valid if the token that is returned is the same as the token stored
             return token.Equals(_token);
+        }
+
+        public static bool Logoff()
+        {
+            var xmlResponse = postAndGetXml("logoff");
+            _token = null;
+            _url = null;
+            _mainUri = null;
+            _version = -1;
+            _minVersion = -1;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets all the filters from the server
+        /// </summary>
+        /// <returns></returns>
+        public static List<Filter> GetFilters()
+        {
+            //get the xml response listing all filters
+            var xmlResponse = postAndGetXml("listFilters");
+
+            //Grab filters element
+            var xmlFilters = xmlResponse.Element(XName.Get("filters", xmlResponse.GetDefaultNamespace().ToString()));
+
+            //Populate list of Filters and return
+            var filters = new List<Filter>();
+            foreach(var fil in xmlFilters.Elements())
+            {
+                var type = Filter.StringToFilterType(fil.Attribute("type").Value);
+                var sFilter = fil.Attribute("sFilter").Value;
+                var current = fil.Attribute("status").Value ?? "";
+                var description = fil.Value;
+
+                //If the filter is currently selected then initialize it as such
+                if (current == "current")
+                    filters.Add(new Filter(type, sFilter, description, true));
+                else
+                    filters.Add(new Filter(type, sFilter, description));
+            }
+
+            return filters;
+        }
+
+        /// <summary>
+        /// Changes the current filter
+        /// </summary>
+        /// <param name="previousFilter"></param>
+        /// <param name="newFilter"></param>
+        public static void ChangeCurrentFilter(Filter previousFilter, Filter newFilter)
+        {
+            previousFilter.SetNotCurrent();
+
+            //Set current filter, reponse should be empty
+            var xmlResponse = postAndGetXml($"setCurrentfilter&sFilter={newFilter.sFilter}");
+
+            newFilter.SetCurrent();
         }
     }
 }
