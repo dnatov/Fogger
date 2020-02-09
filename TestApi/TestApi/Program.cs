@@ -6,14 +6,22 @@ using System.Threading.Tasks;
 
 namespace TestApi
 {
+    //Test project integrating API
     class Program
     {
         static void Main(string[] args)
         {
-            FogBugzApiWrapper.InitializeApi(@"https://example.fogbugz.com");
-            Console.WriteLine($"Version: {FogBugzApiWrapper.Version}");
-            Console.WriteLine($"MinVersion: {FogBugzApiWrapper.MinVersion}");
-            Console.WriteLine($"Url: {FogBugzApiWrapper.Url}");
+            //Semi colon seperated fogbugz enviroment variable in the form of domain;user
+            var SuperSecretLogin = Environment.GetEnvironmentVariable("Fogbugz").Split(';');
+            var Domain = SuperSecretLogin[0];
+            var UserName = SuperSecretLogin[1];
+            Console.Write("Enter Password:"); var Password = Console.ReadLine();
+
+            var Api = new FogBugzApiWrapper(Domain, UserName, Password);
+            var filters = Api.GetFilters();
+
+            //Always logoff to invalidate token
+            Api.Logoff();
         }
 
     }

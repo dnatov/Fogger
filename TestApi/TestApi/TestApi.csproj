@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Fogger\FogBugzApi\FogBugzApi.csproj" />
+    <ProjectReference Include="..\..\FogBugzApi\FogBugzApi.csproj" />
   </ItemGroup>
 
 </Project>
