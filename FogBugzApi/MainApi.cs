@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Xml.Linq;
 using System.Xml;
 using System.Linq;
+using System.Text;
 
 namespace FogBugzApi
 {
@@ -15,10 +16,12 @@ namespace FogBugzApi
         private string _url;
         private string _mainUri;
         private string _token;
+        private Filter _previousFilter;
 
         public int Version { get => _version; set => _version = value; }
         public int MinVersion { get => _minVersion; set => _minVersion = value; }
         public string Url { get => _mainUri + '/' + _url; set => _url = value; }
+        public string Token { get => _token; }
 
         private string sendPost(string uri, FormUrlEncodedContent content)
         {
@@ -145,6 +148,7 @@ namespace FogBugzApi
             _mainUri = null;
             _version = -1;
             _minVersion = -1;
+            _previousFilter = null;
 
             return true;
         }
@@ -185,16 +189,72 @@ namespace FogBugzApi
         /// </summary>
         /// <param name="previousFilter"></param>
         /// <param name="newFilter"></param>
-        public void ChangeCurrentFilter(Filter previousFilter, Filter newFilter)
+        public void SetCurrentFilter(Filter newFilter)
         {
-            previousFilter.SetNotCurrent();
+            _previousFilter?.SetNotCurrent();
 
             //Set current filter, reponse should be empty
-            var xml = postAndGetXml($"setCurrentfilter&sFilter={newFilter.sFilter}");
+            postAndGetXml($"setCurrentFilter&sFilter={newFilter.sFilter}");
 
             newFilter.SetCurrent();
         }
 
+        public List<Case> SearchCurrentFilter()
+        {
+            return Search("");
+        }
+
+        /// <summary>
+        /// Searches for the given query, returns case information using default column names and 50 cases
+        /// </summary>
+        /// <param name="query"></param>
+        public List<Case> Search(string query)
+        {
+            var columns = new List<string>()
+            {
+                "sArea", //Area
+                "ixBug", //Case #
+                "sCategory", //Category
+                "ixPriority", //Priority integer
+                "sPriority", //Priority name
+                "sProject", //Project name
+                "sStatus", //Status
+                "sTitle" //Title
+            };
+            return Search(query, columns);
+        }
+        /// <summary>
+        /// Searches for cases using the query term and returns case information using columnNames up to 50 cases
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="columnNames"></param>
+        public List<Case> Search(string query, IList<string> columnNames) 
+        {
+            return Search(query, columnNames, 50);
+        }
+        /// <summary>
+        /// Searches for the given query, returns the column information for a desinated case amount
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="columnNames"></param>
+        /// <param name="max"></param>
+        public List<Case> Search(string query, IList<string> columnNames, int max)
+        {
+            var cases = new List<Case>();
+            var sbColumns = new StringBuilder();
+            foreach (var col in columnNames)
+            {
+                sbColumns.Append(col + ",");
+            }
+            sbColumns.Remove(sbColumns.Length - 1, 1);
+            var xml = postAndGetXml($"search&q={query}&cols={sbColumns.ToString()}&max={max}");
+            Console.WriteLine(xml.ToString());
+            foreach(var caseXml in xml.Elements().Elements().Where(c=>c.Name.LocalName == "case"))
+            {
+                cases.Add(new Case(caseXml));
+            }
+            return cases;
+        }
 
     }
 }
