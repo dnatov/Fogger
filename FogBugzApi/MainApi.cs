@@ -16,6 +16,7 @@ namespace FogBugzApi
         private Filter _previousFilter;
 
         internal HttpClientHelper HttpClientHelper;
+        public CaseManager CaseManager;
 
         public int Version { get => _version; set => _version = value; }
         public int MinVersion { get => _minVersion; set => _minVersion = value; }
@@ -64,6 +65,7 @@ namespace FogBugzApi
             initializeApi(Uri);
             var token = logon(Uri,Username,Password);
             HttpClientHelper.initHttp(Uri + '/' + _urlSuffix, token);
+            CaseManager = new CaseManager(HttpClientHelper);
         }
 
         /// <summary>
