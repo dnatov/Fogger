@@ -33,21 +33,31 @@ namespace FogBugzApi
             Title = getCaseTagValue(inputXml, "sTitle");
         }
 
+        /// <summary>
+        /// Stores the case variable as a partial http string (ex. &sArea="Area String")
+        /// </summary>
+        /// <param name="inputXml"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         private string getCaseTagValue(XElement inputXml, string tag)
         {
-            var elements = inputXml.Elements().ToList();
-            return inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value;
+            var sb = new StringBuilder();
+            sb.Append('&');
+            sb.Append(tag + '=');
+            sb.Append(inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value);
+            return sb.ToString();
         }
 
         /// <summary>
-        /// Intercept Fody inject OnPropertyChanged so we can create a changeset
+        /// Intercept Fody inject OnPropertyChanged so we can create a changeset.
         /// </summary>
         /// <param name="eventArgs"></param>
-        protected void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
+        protected void OnPropertyChanged(string propertyName, object before, object after)
         {
             Changeset ??= new List<string>();
-            PropertyChanged?.Invoke(this, eventArgs);
-            Changeset.Add(eventArgs.PropertyName);
+            var e = new PropertyChangedEventArgs(propertyName);
+            PropertyChanged?.Invoke(this, e);
+            if (after?.ToString() != null) Changeset.Add(after.ToString());
         }
     }
 }

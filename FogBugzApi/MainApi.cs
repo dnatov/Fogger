@@ -16,11 +16,10 @@ namespace FogBugzApi
         private Filter _previousFilter;
 
         internal HttpClientHelper HttpClientHelper;
-        public CaseManager CaseManager;
+        public static ICaseManager CaseManager;
 
         public int Version { get => _version; set => _version = value; }
         public int MinVersion { get => _minVersion; set => _minVersion = value; }
-        public string Token { get => HttpClientHelper.Token; }
 
         /// <summary>
         /// Grabs the initial Url for all further calls to the API. Gets version info of the FogBugz install as well.
@@ -74,7 +73,6 @@ namespace FogBugzApi
         /// <returns></returns>
         public bool ValidateLogon()
         {
-            //Store in XElement Obj
             var xml = HttpClientHelper.postAndGetXml("logon");
 
             //Parse HTML for token. FogBugz recommends using this token as long as you can in favor of a new login request.

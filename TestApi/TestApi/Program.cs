@@ -20,10 +20,6 @@ namespace TestApi
             //Initialize api and login
             var Api = new FogBugzApiWrapper(Domain, UserName, Password);
 
-            //Retrieve token, wrapper generates this automatically and uses it for the object's
-            //lifetime.
-            var token = Api.Token;
-
             //Get the current filters availiable
             var filters = Api.GetFilters();
 
