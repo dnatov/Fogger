@@ -12,48 +12,51 @@ namespace FogBugzApi
     {
         private int _version = -1;
         private int _minVersion = -1;
-        private string _urlSuffix;
         private Filter _previousFilter;
 
-        internal HttpClientHelper HttpClientHelper;
+        internal IHttpClient HttpClientHelper;
         public static ICaseManager CaseManager;
 
         public int Version { get => _version; set => _version = value; }
         public int MinVersion { get => _minVersion; set => _minVersion = value; }
 
         /// <summary>
-        /// Grabs the initial Url for all further calls to the API. Gets version info of the FogBugz install as well.
+        /// Grabs the initial Url for all further calls to the API. Gets version info of the FogBugz and initializes the Http Client
         /// </summary>
         /// <param name="uri"></param>
         private void initializeApi(string uri)
         {
-            HttpClientHelper = new HttpClientHelper();
+            HttpClientHelper = HttpClientFactory.CreateHttpClient();
 
             //Initial Post
-            var post = HttpClientHelper.postWithoutContent(uri + @"/api.xml");
+            var post = HttpClientHelper.PostWithoutContent(uri + @"/api.xml");
+
             //Store in XElement Obj
             var xml = XElement.Parse(post);
-            HttpClientHelper.checkResponseForErrorCode(xml);
+            HttpClientHelper.CheckResponseForErrorCode(xml);
 
             //Parse HTML
             _version = Int32.Parse(xml.Elements().Where(x => x.Name.LocalName == "version").FirstOrDefault().Value);
             _minVersion = Int32.Parse(xml.Elements().Where(x => x.Name.LocalName == "minversion").FirstOrDefault().Value);
-            _urlSuffix = xml.Elements().Where(x => x.Name.LocalName == "url").FirstOrDefault().Value;
+            HttpClientHelper.UriString = uri + '/' + xml.Elements().Where(x => x.Name.LocalName == "url").FirstOrDefault().Value;
+
+            //Create version dependent Case Manager
+            CaseManager = CaseManagerFactory.CreateCaseManager(_version, _minVersion, HttpClientHelper);
         }
 
         /// <summary>
-        /// Performs a logon operation using the Email and Password of the user.
+        /// Performs a logon operation using the Email and Password of the user. Retreives the api token.
         /// </summary>
         /// <param name="user"></param>
         /// <param name="pass"></param>
-        private string logon(string uri, string user,string pass)
+        private string logon(string user,string pass)
         {
             //POST using other private method since this assume token is undefined
-            var post = HttpClientHelper.postWithoutContent($"{uri}cmd = logon&email={user}&password={pass}");
+            var post = HttpClientHelper.PostWithoutContent($"{HttpClientHelper.UriString}cmd=logon&email={user}&password={pass}");
 
             //Store in XElement Obj
             var xml = XElement.Parse(post);
-            HttpClientHelper.checkResponseForErrorCode(xml);
+            HttpClientHelper.CheckResponseForErrorCode(xml);
 
             //Parse HTML for token. FogBugz recommends using this token as long as you can in favor of a new login request.
             return (xml.Elements().Where(x => x.Name.LocalName == "token").FirstOrDefault().Value);
@@ -62,9 +65,8 @@ namespace FogBugzApi
         public FogBugzApiWrapper(string Uri, string Username, string Password)
         {
             initializeApi(Uri);
-            var token = logon(Uri,Username,Password);
-            HttpClientHelper.initHttp(Uri + '/' + _urlSuffix, token);
-            CaseManager = new CaseManager(HttpClientHelper);
+            var token = logon(Username,Password);
+            HttpClientHelper.ApiToken = token;
         }
 
         /// <summary>
@@ -73,19 +75,18 @@ namespace FogBugzApi
         /// <returns></returns>
         public bool ValidateLogon()
         {
-            var xml = HttpClientHelper.postAndGetXml("logon");
+            var xml = HttpClientHelper.PostAndGetXml("logon");
 
             //Parse HTML for token. FogBugz recommends using this token as long as you can in favor of a new login request.
             var token = (xml.Elements().Where(x => x.Name.LocalName == "token").FirstOrDefault().Value);
 
             //Logon is only valid if the token that is returned is the same as the token stored
-            return token.Equals(HttpClientHelper.Token);
+            return token.Equals(HttpClientHelper.ApiToken);
         }
 
         public bool Logoff()
         {
-            HttpClientHelper.postAndGetXml("logoff");
-            _urlSuffix = null;
+            HttpClientHelper.PostAndGetXml("logoff");
             _version = -1;
             _minVersion = -1;
             _previousFilter = null;
@@ -98,10 +99,10 @@ namespace FogBugzApi
         /// Gets all the filters from the server
         /// </summary>
         /// <returns></returns>
-        public List<Filter> GetFilters()
+        public IList<Filter> GetFilters()
         {
             //get the xml response listing all filters
-            var xmlResponse = HttpClientHelper.postAndGetXml("listFilters");
+            var xmlResponse = HttpClientHelper.PostAndGetXml("listFilters");
 
             //Grab filters element
             var xmlFilters = xmlResponse.Element(XName.Get("filters", xmlResponse.GetDefaultNamespace().ToString()));
@@ -135,14 +136,14 @@ namespace FogBugzApi
             _previousFilter?.SetNotCurrent();
 
             //Set current filter, reponse should be empty
-            HttpClientHelper.postAndGetXml($"setCurrentFilter&sFilter={newFilter.sFilter}");
+            HttpClientHelper.PostAndGetXml($"setCurrentFilter&sFilter={newFilter.sFilter}");
 
             newFilter.SetCurrent();
 
             _previousFilter = newFilter;
         }
 
-        public List<Case> SearchCurrentFilter()
+        public IList<Case> SearchCurrentFilter()
         {
             return Search("");
         }
@@ -151,7 +152,7 @@ namespace FogBugzApi
         /// Searches for the given query, returns case information using default column names and 50 cases
         /// </summary>
         /// <param name="query"></param>
-        public List<Case> Search(string query)
+        public IList<Case> Search(string query)
         {
             var columns = new List<string>()
             {
@@ -171,7 +172,7 @@ namespace FogBugzApi
         /// </summary>
         /// <param name="query"></param>
         /// <param name="columnNames"></param>
-        public List<Case> Search(string query, IList<string> columnNames) 
+        public IList<Case> Search(string query, IList<string> columnNames) 
         {
             return Search(query, columnNames, 50);
         }
@@ -181,7 +182,7 @@ namespace FogBugzApi
         /// <param name="query"></param>
         /// <param name="columnNames"></param>
         /// <param name="max"></param>
-        public List<Case> Search(string query, IList<string> columnNames, int max)
+        public IList<Case> Search(string query, IList<string> columnNames, int max)
         {
             var cases = new List<Case>();
             var sbColumns = new StringBuilder();
@@ -190,7 +191,7 @@ namespace FogBugzApi
                 sbColumns.Append(col + ",");
             }
             sbColumns.Remove(sbColumns.Length - 1, 1);
-            var xml = HttpClientHelper.postAndGetXml($"search&q={query}&cols={sbColumns.ToString()}&max={max}");
+            var xml = HttpClientHelper.PostAndGetXml($"search&q={query}&cols={sbColumns.ToString()}&max={max}");
             Console.WriteLine(xml.ToString());
             foreach(var caseXml in xml.Elements().Elements().Where(c=>c.Name.LocalName == "case"))
             {

@@ -7,21 +7,16 @@ using System.Xml.Linq;
 
 namespace FogBugzApi
 {
-    internal class HttpClientHelper
+    public class HttpClientHelper : IHttpClient
     {
         private readonly HttpClient _client = new HttpClient();
         private string _apiToken;
-        private string _urlString;
+        private string _uriString;
 
-        internal string Token { get => _apiToken; }
+        public string ApiToken { get => _apiToken; set => _apiToken = value; }
+        public string UriString { get => _uriString; set => _uriString = value; }
 
-        internal void initHttp(string url, string api)
-        {
-            _urlString = url;
-            _apiToken = api;
-        }
-
-        internal string sendPost(string uri, FormUrlEncodedContent content)
+        public string SendPost(string uri, FormUrlEncodedContent content)
         {
             var post = _client.PostAsync(uri, content);
             post.Wait();
@@ -30,12 +25,8 @@ namespace FogBugzApi
             return (htmlString.Result ?? "");
         }
 
-        /// <summary>
-        /// Performs initial Post on given fogbugz uri. Returns html response string, "" if null"
-        /// </summary>
-        /// <param name="uriCommand"></param>
-        /// <returns></returns>
-        internal string postWithoutContent(string uriCommand)
+        
+        public string PostWithoutContent(string uriCommand)
         {
             //Use empty content
             var content = new FormUrlEncodedContent(
@@ -43,10 +34,10 @@ namespace FogBugzApi
                 {
                     {" "," "}
                 });
-            return sendPost(uriCommand, content);
+            return SendPost(uriCommand, content);
         }
 
-        internal void checkResponseForErrorCode(XElement xml)
+        public void CheckResponseForErrorCode(XElement xml)
         {
             //Check for error tag and its attribute
             var errorElement = xml.Elements().Where(x => x.Name.LocalName == "error").FirstOrDefault();
@@ -62,16 +53,11 @@ namespace FogBugzApi
             }
         }
 
-        /// <summary>
-        /// Uses existing Url and Token to POST with the command in cmd= and returns an xml response. Raises appropriate exception if the response contains an error tag.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        internal XElement postAndGetXml(string command)
+        public XElement PostAndGetXml(string command)
         {
-            var post = postWithoutContent($"{_urlString}cmd={command}&token={_apiToken}");
+            var post = PostWithoutContent($"{_uriString}cmd={command}&token={_apiToken}");
             var xml = XElement.Parse(post);
-            checkResponseForErrorCode(xml);
+            CheckResponseForErrorCode(xml);
             return xml;
         }
     }

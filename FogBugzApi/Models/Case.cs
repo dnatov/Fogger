@@ -9,8 +9,19 @@ namespace FogBugzApi
 {
     public class Case : INotifyPropertyChanged
     {
+        //TODO: Store html friendly values here
+        private string area;
+        private string number;
+        private string category;
+        private string priorityInteger;
+        private string priorityName;
+        private string projectName;
+        private string status;
+        private string title;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
+        //TODO: Store human friendly values here
         public string Area;
         public string Number;
         public string Category;
@@ -23,14 +34,14 @@ namespace FogBugzApi
         public List<String> Changeset;
         public Case(XElement inputXml)
         {
-            Area = getCaseTagValue(inputXml, "sArea");
-            Number = getCaseTagValue(inputXml, "ixBug");
-            Category = getCaseTagValue(inputXml, "sCategory");
-            PriorityInteger = getCaseTagValue(inputXml, "ixPriority");
-            PriorityName = getCaseTagValue(inputXml, "sPriority");
-            ProjectName = getCaseTagValue(inputXml, "sProject");
-            Status = getCaseTagValue(inputXml, "sStatus");
-            Title = getCaseTagValue(inputXml, "sTitle");
+            area = getCaseTagValue(inputXml, "sArea");
+            number = getCaseTagValue(inputXml, "ixBug");
+            category = getCaseTagValue(inputXml, "sCategory");
+            priorityInteger = getCaseTagValue(inputXml, "ixPriority");
+            priorityName = getCaseTagValue(inputXml, "sPriority");
+            projectName = getCaseTagValue(inputXml, "sProject");
+            status = getCaseTagValue(inputXml, "sStatus");
+            title = getCaseTagValue(inputXml, "sTitle");
         }
 
         /// <summary>

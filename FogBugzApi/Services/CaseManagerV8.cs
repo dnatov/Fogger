@@ -2,10 +2,10 @@
 
 namespace FogBugzApi
 {
-    public class CaseManager : ICaseManager
+    public class CaseManagerV8 : ICaseManager
     {
-        private HttpClientHelper _httpClient;
-        internal CaseManager(HttpClientHelper httpClient)
+        private IHttpClient _httpClient;
+        internal CaseManagerV8(IHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -21,41 +21,66 @@ namespace FogBugzApi
 
         //TODO: Add resolve, close, email, reply and forward
 
+        /// <summary>
+        /// Uses the Case.Changset command strings to create a new case.
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
         public void NewCase(Case caseWithChanges)
         {
             if (caseWithChanges.Changeset == null) return;
             var properties = createPropertyChangesetString(caseWithChanges);
-            _httpClient.postAndGetXml("new" + properties);
+            _httpClient.PostAndGetXml("new" + properties);
         }
 
+        /// <summary>
+        /// Uses the Case.Changset command strings to create a edit an existing case.
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
         public void EditCase(Case caseWithChanges)
         {
             if (caseWithChanges.Changeset == null) return;
             var properties = createPropertyChangesetString(caseWithChanges);
-            _httpClient.postAndGetXml("edit" + properties);
+            _httpClient.PostAndGetXml("edit" + properties);
         }
 
+        /// <summary>
+        /// Assigns an existing case with additional edits from Case.Changset command strings.
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
         public void AssignCase(Case caseWithChanges)
         {
             if (caseWithChanges.Changeset == null) return;
             var properties = createPropertyChangesetString(caseWithChanges);
-            _httpClient.postAndGetXml("assign" + properties);
+            _httpClient.PostAndGetXml("assign" + properties);
         }
 
+        /// <summary>
+        /// Reactivates an existing case with additional edits from Case.Changset command strings.
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
         public void ReactivateCase(Case caseWithChanges)
         {
             if (caseWithChanges.Changeset == null) return;
             var properties = createPropertyChangesetString(caseWithChanges);
-            _httpClient.postAndGetXml("reactivate" + properties);
+            _httpClient.PostAndGetXml("reactivate" + properties);
         }
 
+        /// <summary>
+        /// Reopens an existing case with additional edits from Case.Changset command strings.
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
         public void ReopenCase(Case caseWithChanges)
         {
             if (caseWithChanges.Changeset == null) return;
             var properties = createPropertyChangesetString(caseWithChanges);
-            _httpClient.postAndGetXml("reopen" + properties);
+            _httpClient.PostAndGetXml("reopen" + properties);
         }
 
+        /// <summary>
+        /// Takes an input case and creates a single string combining all the commands to pass to the HTML Client
+        /// </summary>
+        /// <param name="caseWithChanges"></param>
+        /// <returns></returns>
         private string createPropertyChangesetString(Case caseWithChanges)
         {
             var sbChanges = new StringBuilder();
