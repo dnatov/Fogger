@@ -9,39 +9,28 @@ namespace FogBugzApi
 {
     public class Case : INotifyPropertyChanged
     {
-        //TODO: Store html friendly values here
-        private string area;
-        private string number;
-        private string category;
-        private string priorityInteger;
-        private string priorityName;
-        private string projectName;
-        private string status;
-        private string title;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //TODO: Store human friendly values here
-        public string Area;
-        public string Number;
-        public string Category;
-        public string PriorityInteger;
-        public string PriorityName;
-        public string ProjectName;
-        public string Status;
-        public string Title;
+        public CaseProperty? Area;
+        public CaseProperty? Number;
+        public CaseProperty? Category;
+        public CaseProperty? PriorityInteger;
+        public CaseProperty? PriorityName;
+        public CaseProperty? ProjectName;
+        public CaseProperty? Status;
+        public CaseProperty? Title;
 
         public List<String> Changeset;
         public Case(XElement inputXml)
         {
-            area = getCaseTagValue(inputXml, "sArea");
-            number = getCaseTagValue(inputXml, "ixBug");
-            category = getCaseTagValue(inputXml, "sCategory");
-            priorityInteger = getCaseTagValue(inputXml, "ixPriority");
-            priorityName = getCaseTagValue(inputXml, "sPriority");
-            projectName = getCaseTagValue(inputXml, "sProject");
-            status = getCaseTagValue(inputXml, "sStatus");
-            title = getCaseTagValue(inputXml, "sTitle");
+            Area = setCaseTagValue(inputXml, "sArea");
+            Number = setCaseTagValue(inputXml, "ixBug");
+            Category = setCaseTagValue(inputXml, "sCategory");
+            PriorityInteger = setCaseTagValue(inputXml, "ixPriority");
+            PriorityName = setCaseTagValue(inputXml, "sPriority");
+            ProjectName = setCaseTagValue(inputXml, "sProject");
+            Status = setCaseTagValue(inputXml, "sStatus");
+            Title = setCaseTagValue(inputXml, "sTitle");
         }
 
         /// <summary>
@@ -50,13 +39,19 @@ namespace FogBugzApi
         /// <param name="inputXml"></param>
         /// <param name="tag"></param>
         /// <returns></returns>
-        private string getCaseTagValue(XElement inputXml, string tag)
+        private CaseProperty? setCaseTagValue(XElement inputXml, string tag)
         {
-            var sb = new StringBuilder();
-            sb.Append('&');
-            sb.Append(tag + '=');
-            sb.Append(inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value);
-            return sb.ToString();
+            if (inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value != null)
+            {
+                var cp = new CaseProperty();
+                cp.HtmlHeader = '&' + tag + '=';
+                cp.Value = inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value;
+                return cp;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -65,10 +60,14 @@ namespace FogBugzApi
         /// <param name="eventArgs"></param>
         protected void OnPropertyChanged(string propertyName, object before, object after)
         {
-            Changeset ??= new List<string>();
+            if (before is CaseProperty)
+            {
+                Changeset ??= new List<string>();
+                if (after?.ToString() != null) Changeset.Add(after.ToString());
+            }
             var e = new PropertyChangedEventArgs(propertyName);
             PropertyChanged?.Invoke(this, e);
-            if (after?.ToString() != null) Changeset.Add(after.ToString());
         }
+
     }
 }
