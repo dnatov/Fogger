@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Xml.Linq;
 
 namespace FogBugzApi
@@ -63,7 +64,8 @@ namespace FogBugzApi
             if (before is CaseProperty)
             {
                 Changeset ??= new List<string>();
-                if (after?.ToString() != null) Changeset.Add(after.ToString());
+                var cp = after as CaseProperty?;
+                if (cp?.Value != null) Changeset.Add(cp?.HtmlHeader + HttpUtility.HtmlEncode(cp?.Value));
             }
             var e = new PropertyChangedEventArgs(propertyName);
             PropertyChanged?.Invoke(this, e);
