@@ -21,7 +21,7 @@ namespace TestApi
             var Api = new FogBugzApiWrapper(Domain, UserName, Password);
 
             //Get the current filters availiable
-            var filters = new List<Filter>(Api.GetFilters());
+            var filters = Api.GetFilters();
 
             //Sets the current filter in the api and the wrapper
             Api.SetCurrentFilter(filters.Find(x => (x.sFilter == "377")));

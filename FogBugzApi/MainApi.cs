@@ -99,7 +99,7 @@ namespace FogBugzApi
         /// Gets all the filters from the server
         /// </summary>
         /// <returns></returns>
-        public IList<Filter> GetFilters()
+        public List<Filter> GetFilters()
         {
             //get the xml response listing all filters
             var xmlResponse = HttpClientHelper.PostAndGetXml("listFilters");
@@ -143,7 +143,7 @@ namespace FogBugzApi
             _previousFilter = newFilter;
         }
 
-        public IList<Case> SearchCurrentFilter()
+        public List<Case> SearchCurrentFilter()
         {
             return Search("");
         }
@@ -152,8 +152,9 @@ namespace FogBugzApi
         /// Searches for the given query, returns case information using default column names and 50 cases
         /// </summary>
         /// <param name="query"></param>
-        public IList<Case> Search(string query)
+        public List<Case> Search(string query)
         {
+            //Default Search query columns for now
             var columns = new List<string>()
             {
                 "sArea", //Area
@@ -172,7 +173,7 @@ namespace FogBugzApi
         /// </summary>
         /// <param name="query"></param>
         /// <param name="columnNames"></param>
-        public IList<Case> Search(string query, IList<string> columnNames) 
+        public List<Case> Search(string query, IList<string> columnNames) 
         {
             return Search(query, columnNames, 50);
         }
@@ -182,7 +183,7 @@ namespace FogBugzApi
         /// <param name="query"></param>
         /// <param name="columnNames"></param>
         /// <param name="max"></param>
-        public IList<Case> Search(string query, IList<string> columnNames, int max)
+        public List<Case> Search(string query, IList<string> columnNames, int max)
         {
             var cases = new List<Case>();
             var sbColumns = new StringBuilder();

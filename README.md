@@ -30,18 +30,22 @@ ApiWrapper.SetCurrentFilter(filters[0]);
 Finally you can search the current filter using SearchCurrentFilter() method. This method has a few overloads for specifying the column information to return and the maximum number of search results.
 ```
 //List all cases in filter
-var cases = ApiWrapper.SearchCurrentFilter();
+List<Case> cases = ApiWrapper.SearchCurrentFilter();
 
 //Search for certain string
-var cases = ApiWrapper.SearchCurrentFilter("What is love?"); //bb dont hurt me
+List<Case> cases = ApiWrapper.SearchCurrentFilter("What is love?"); //bb dont hurt me
 
 //Search for certain string listing only case names
-var cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"});
+List<Case> cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"});
 
 //Search for certain string listing only case names with a maximum of 10
-var cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"}, 10);
+List<Case> cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"}, 10);
 ```
+You will notice that this method's output is a List\<Case\>\(\). Cases are the main way to change and store information while using Fogger. More on cases below.
+
+Regarding Column Names:
 You can find a comprehensive list of column information here: https://support.fogbugz.com/hc/en-us/articles/360011343413-FogBugz-XML-API-Version-8#Sample_XML_Payloads
+In the future an enumeration will be made that contains all the default columns in FogBugz filters.
 
 ## Cases
 The output of these filter searches are Case objects.
