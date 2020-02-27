@@ -12,39 +12,37 @@ namespace FogBugzApi
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public CaseProperty? Area;
-        public CaseProperty? AreaId;
-        public CaseProperty? Category;
-        public CaseProperty? Children;
-        public CaseProperty? DuplicateCaseIds;
-        public CaseProperty? DuplicateOriginal;
-        public CaseProperty? EmailAssignedTo;
-        public CaseProperty? EventLatestText;
-        public CaseProperty? FixForId;
-        public CaseProperty? FixForName;
-        public CaseProperty? FixForDateTime;
-        public CaseProperty? GroupId;
-        public CaseProperty? PersonAssignedId;
-        public CaseProperty? PersonAssignedName;
-        public CaseProperty? PersonClosedId;
-        public CaseProperty? PersonLastEditedId;
-        public CaseProperty? PersonOpenedId;
-        public CaseProperty? PersonResolvedId;
-        public CaseProperty? IsOpen;
-        public CaseProperty? LatestTextSummary;
-        public CaseProperty? Number;
-        public CaseProperty? OriginalTitle;
-        public CaseProperty? Parent;
-        public CaseProperty? PriorityInteger;
-        public CaseProperty? PriorityName;
-        public CaseProperty? ProjectId;
-        public CaseProperty? ProjectName;
-        public CaseProperty? Status;
-
-        public CaseProperty? StatusId { get; }
-
-        public CaseProperty? Tags;
-        public CaseProperty? Title;
+        public CaseProperty Area;
+        public CaseProperty AreaId;
+        public CaseProperty Category;
+        public CaseProperty Children;
+        public CaseProperty DuplicateCaseIds;
+        public CaseProperty DuplicateOriginal;
+        public CaseProperty EmailAssignedTo;
+        public CaseProperty EventLatestText;
+        public CaseProperty FixForId;
+        public CaseProperty FixForName;
+        public CaseProperty FixForDateTime;
+        public CaseProperty GroupId;
+        public CaseProperty PersonAssignedId;
+        public CaseProperty PersonAssignedName;
+        public CaseProperty PersonClosedId;
+        public CaseProperty PersonLastEditedId;
+        public CaseProperty PersonOpenedId;
+        public CaseProperty PersonResolvedId;
+        public CaseProperty IsOpen;
+        public CaseProperty LatestTextSummary;
+        public CaseProperty Number;
+        public CaseProperty OriginalTitle;
+        public CaseProperty Parent;
+        public CaseProperty PriorityInteger;
+        public CaseProperty PriorityName;
+        public CaseProperty ProjectId;
+        public CaseProperty ProjectName;
+        public CaseProperty Status;
+        public CaseProperty StatusId;
+        public CaseProperty Tags;
+        public CaseProperty Title;
 
         public List<String> Changeset;
         public Case(XElement inputXml)
@@ -88,7 +86,7 @@ namespace FogBugzApi
         /// <param name="inputXml"></param>
         /// <param name="tag"></param>
         /// <returns></returns>
-        private CaseProperty? setCaseTagValueString(XElement inputXml, string tag)
+        private CaseProperty setCaseTagValueString(XElement inputXml, string tag)
         {
             if (inputXml.Elements().Where(x => x.Name.LocalName == tag).FirstOrDefault()?.Value != null)
             {
@@ -99,7 +97,7 @@ namespace FogBugzApi
             }
             else
             {
-                return null;
+                return new CaseProperty();
             }
         }
 
@@ -113,8 +111,8 @@ namespace FogBugzApi
             if (before is CaseProperty)
             {
                 Changeset ??= new List<string>();
-                var cp = after as CaseProperty?;
-                var cpBefore = before as CaseProperty?;
+                var cp = after as CaseProperty;
+                var cpBefore = before as CaseProperty;
                 Changeset.Remove(cpBefore?.HtmlHeader + HttpUtility.HtmlEncode(cpBefore?.Value));
                 if (cp?.Value != null) Changeset.Add(cp?.HtmlHeader + HttpUtility.HtmlEncode(cp?.Value));
             }

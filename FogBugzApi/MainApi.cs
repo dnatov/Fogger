@@ -15,7 +15,7 @@ namespace FogBugzApi
         private Filter _previousFilter;
 
         internal IHttpClient HttpClientHelper;
-        public static ICaseManager CaseManager;
+        public ICaseManager CaseManager;
 
         public int Version { get => _version; set => _version = value; }
         public int MinVersion { get => _minVersion; set => _minVersion = value; }
@@ -62,10 +62,16 @@ namespace FogBugzApi
             return (xml.Elements().Where(x => x.Name.LocalName == "token").FirstOrDefault().Value);
         }
 
-        public FogBugzApiWrapper(string Uri, string Username, string Password)
+        public FogBugzApiWrapper(string uri, string username, string password)
         {
-            initializeApi(Uri);
-            var token = logon(Username,Password);
+            initializeApi(uri);
+            var token = logon(username, password);
+            HttpClientHelper.ApiToken = token;
+        }
+
+        public FogBugzApiWrapper(string uri, string token)
+        {
+            initializeApi(uri);
             HttpClientHelper.ApiToken = token;
         }
 

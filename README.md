@@ -18,6 +18,11 @@ var token = ApiWrapper.HttpClientHelper.ApiToken;
 //Logoff
 ApiWrapper.Logoff();
 ```
+If you already have previously generated a token using the API or the web interface you can reinitialize the API with the alternate constructor.
+```
+//Login with an existing token
+var ApiWrapper = new FogBugzApiWrapper("http://www.example.com/fogbugz", "<TokenStringHere>");
+```
 ## Filters
 Fogger uses 'Filter' objects. These filters correspond to filters on the FogBugz domain. You can get all the available filters using the GetFilters() method.
 ```
@@ -30,16 +35,16 @@ ApiWrapper.SetCurrentFilter(filters[0]);
 Finally you can search the current filter using SearchCurrentFilter() method. This method has a few overloads for specifying the column information to return and the maximum number of search results.
 ```
 //List all cases in filter
-List<Case> cases = ApiWrapper.SearchCurrentFilter();
+List<Case> cases = ApiWrapper.Search(""); //Alternatively you can user SearchCurrentFilter() method
 
 //Search for certain string
-List<Case> cases = ApiWrapper.SearchCurrentFilter("What is love?"); //bb dont hurt me
+List<Case> cases = ApiWrapper.Search("What is love?"); //bb dont hurt me
 
 //Search for certain string listing only case names
-List<Case> cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"});
+List<Case> cases = ApiWrapper.Search("Mario", new List<string>{"sTitle"});
 
 //Search for certain string listing only case names with a maximum of 10
-List<Case> cases = ApiWrapper.SearchCurrentFilter("Mario", new List<string>{"sTitle"}, 10);
+List<Case> cases = ApiWrapper.Search("Mario", new List<string>{"sTitle"}, 10);
 ```
 You will notice that this method's output is a List\<Case\>\(\). Cases are the main way to change and store information while using Fogger. More on cases below.
 
@@ -48,7 +53,15 @@ You can find a comprehensive list of column information here: https://support.fo
 In the future an enumeration will be made that contains all the default columns in FogBugz filters.
 
 ## Cases
-The output of these filter searches are Case objects.
-Case objects contain all the information about a case. Using the brilliant Fody NotifyPropertyChanged nuget package, each property changed is stored on the case object under the Changeset property. This generates a list of commands that Fogger will interpret in order to edit, assign, resolve, new and otherwise change a case.
+The output of these filter searches are Case objects. Case objects contain all the information about a case. Using the brilliant Fody NotifyPropertyChanged nuget package, each property changed is stored on the case object under the Changeset property. This generates a list of commands that Fogger will interpret in order to edit, assign, resolve, new and otherwise change a case.
+Editing a case is simple. All you have to do is grab the output of a Filter, adjust the case property you want and feed it into the CaseManager object in the api.
+```
+List<Case> cases = ApiWrapper.Search("");
+var case = cases[0]; //Assuming cases.Count() > 0
+
+case.Title.Value = "Im bad at titles..."; //API is aware this is the only property changed
+
+ApiWrapper.CaseManager.EditCase(case); //This line updates the case on the server
+```
 
 More info coming soon...
