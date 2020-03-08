@@ -54,6 +54,7 @@ In the future an enumeration will be made that contains all the default columns 
 
 ## Cases
 The output of these filter searches are Case objects. Case objects contain all the information about a case. Using the brilliant Fody NotifyPropertyChanged nuget package, each property changed is stored on the case object under the Changeset property. This generates a list of commands that Fogger will interpret in order to edit, assign, resolve, new and otherwise change a case.
+
 Editing a case is simple. All you have to do is grab the output of a Filter, adjust the case property you want and feed it into the CaseManager object in the api.
 ```
 List<Case> cases = ApiWrapper.Search("");
