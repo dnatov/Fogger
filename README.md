@@ -32,25 +32,32 @@ This returns a list of filters. You can set the current filter using SetCurrentF
 ```
 ApiWrapper.SetCurrentFilter(filters[0]);
 ```
-Finally you can search the current filter using SearchCurrentFilter() method. This method has a few overloads for specifying the column information to return and the maximum number of search results.
+You can search the current filter using Search() method. This method has a few overloads for specifying the column information to return and the maximum number of search results.
 ```
 //List all cases in filter
 List<Case> cases = ApiWrapper.Search(""); //Alternatively you can user SearchCurrentFilter() method
 
 //Search for certain string
 List<Case> cases = ApiWrapper.Search("What is love?"); //bb dont hurt me
+```
+The previous two Search overloads return the Area, Number, Category, PriorityId, Priority Name, Project Name, Status and Title of each case. They also default to a maximum of 50 case results. To specify your search further you must use the next two overloads.
 
-//Search for certain string listing only case names
-List<Case> cases = ApiWrapper.Search("Mario", new List<string>{"sTitle"});
+There two additional Search overloads can utilize the static class **CaseHtmlValue**. This class contains all the default column names defined in the HTML API so you don't have to look for the strings yourself.
 
-//Search for certain string listing only case names with a maximum of 10
-List<Case> cases = ApiWrapper.Search("Mario", new List<string>{"sTitle"}, 10);
+```
+//Search for a certain string listing only case titles
+List<Case> cases = ApiWrapper.Search("Mario", new List<string>{CaseHtmlValue.Title});
+
+//Search for a certain string listing case names and numbers
+List<Case> cases = ApiWrapper.Search("Falco Lombardi", new List<string>{CaseHtmlValue.Title, CaseHtmlValue.Number});
+
+//Search for strings without using CaseHtmlValue
+List<Case> cases = ApiWrapper.Search("Falco Lombardi", new List<string>{"sTitle","ixBug"});
+
+//Search for a certain string listing only case names with a maximum of 10 results
+List<Case> cases = ApiWrapper.Search("Mario", new List<string>{CaseHtmlValue.Title}, 10);
 ```
 You will notice that this method's output is a List\<Case\>\(\). Cases are the main way to change and store information while using Fogger. More on cases below.
-
-Regarding Column Names:
-You can find a comprehensive list of column information here: https://support.fogbugz.com/hc/en-us/articles/360011343413-FogBugz-XML-API-Version-8#Sample_XML_Payloads
-In the future an enumeration will be made that contains all the default columns in FogBugz filters.
 
 ## Cases
 The output of these filter searches are Case objects. Case objects contain all the information about a case. Using the brilliant Fody NotifyPropertyChanged nuget package, each property changed is stored on the case object under the Changeset property. This generates a list of commands that Fogger will interpret in order to edit, assign, resolve, new and otherwise change a case.
