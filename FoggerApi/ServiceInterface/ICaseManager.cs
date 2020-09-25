@@ -1,4 +1,6 @@
-﻿namespace FogBugzApi
+﻿using Fogger.Models;
+
+namespace Fogger.Interfaces
 {
     public interface ICaseManager
     {

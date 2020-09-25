@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FogBugzApi
+namespace Fogger.Exceptions
 {
     /// <summary>
     /// Custom exception for throwing returned API error codes.
     /// </summary>
-    public class FogbugzException : Exception
+    public class FoggerException : Exception
     {
-        public FogbugzException (int errorCode, string errorString) : base(errorString)
+        public FoggerException(int errorCode, string errorString) : base(errorString)
         {
             ErrorCode = errorCode;
         }

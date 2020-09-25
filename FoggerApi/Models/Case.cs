@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Xml.Linq;
 
-namespace FogBugzApi
+namespace Fogger.Models
 {
     public class Case : INotifyPropertyChanged
     {

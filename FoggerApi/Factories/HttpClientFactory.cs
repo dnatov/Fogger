@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Fogger.Interfaces;
+using Fogger.Services;
 
-namespace FogBugzApi
+namespace Fogger.Factories
 {
     public static class HttpClientFactory
     {

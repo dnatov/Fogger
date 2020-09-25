@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Fogger.Exceptions;
+using Fogger.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Xml.Linq;
 
-namespace FogBugzApi
+namespace Fogger.Services
 {
     public class HttpClientHelper : IHttpClient
     {
@@ -48,7 +50,7 @@ namespace FogBugzApi
                 if (Int32.TryParse(errorElement.Attribute("code").Value, out result))
                 {
                     var errorString = errorElement.Value;
-                    throw new FogbugzException(result, errorString);
+                    throw new FoggerException(result, errorString);
                 }
             }
         }

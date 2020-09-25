@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Xml.Linq;
 
-namespace FogBugzApi
+namespace Fogger.Interfaces
 {
     public interface IHttpClient
     {

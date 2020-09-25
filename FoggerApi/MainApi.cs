@@ -5,10 +5,13 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Linq;
 using System.Text;
+using Fogger.Models;
+using Fogger.Interfaces;
+using Fogger.Factories;
 
-namespace FogBugzApi
+namespace Fogger
 {
-    public class FogBugzApiWrapper
+    public class FoggerApiWrapper
     {
         private int _version = -1;
         private int _minVersion = -1;
@@ -62,14 +65,14 @@ namespace FogBugzApi
             return (xml.Elements().Where(x => x.Name.LocalName == "token").FirstOrDefault().Value);
         }
 
-        public FogBugzApiWrapper(string uri, string username, string password)
+        public FoggerApiWrapper(string uri, string username, string password)
         {
             initializeApi(uri);
             var token = logon(username, password);
             HttpClientHelper.ApiToken = token;
         }
 
-        public FogBugzApiWrapper(string uri, string token)
+        public FoggerApiWrapper(string uri, string token)
         {
             initializeApi(uri);
             HttpClientHelper.ApiToken = token;

@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using Fogger.Interfaces;
+using Fogger.Models;
+using System.Text;
 
-namespace FogBugzApi
+namespace Fogger.Services
 {
     public class CaseManagerV8 : ICaseManager
     {
