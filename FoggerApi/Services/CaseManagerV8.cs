@@ -35,7 +35,7 @@ namespace Fogger.Services
         }
 
         /// <summary>
-        /// Uses the Case.Changset command strings to create a edit an existing case.
+        /// Uses the <see cref="Case.Changset"/> command strings to create a edit an existing case.
         /// </summary>
         /// <param name="caseWithChanges"></param>
         public void EditCase(Case caseWithChanges)

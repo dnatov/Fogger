@@ -162,17 +162,20 @@ namespace Fogger.Models
         /// <summary>
         /// Intercept Fody inject OnPropertyChanged so we can create a changeset.
         /// </summary>
-        /// <param name="eventArgs"></param>
         protected void OnPropertyChanged(string propertyName, object before, object after)
         {
             //Intercept property, store it in the changeset, overwrite change if already present
             if (before is CaseProperty)
             {
-                Changeset ??= new List<string>();
-                var cp = after as CaseProperty;
-                var cpBefore = before as CaseProperty;
-                Changeset.Remove(cpBefore?.HtmlHeader + HttpUtility.HtmlEncode(cpBefore?.Value));
-                if (cp?.Value != null) Changeset.Add(cp?.HtmlHeader + HttpUtility.HtmlEncode(cp?.Value));
+                if (Changeset == null)
+                {
+                    Changeset = new List<string>();
+                }
+
+                var cProp = after as CaseProperty;
+                var cPropBefore = before as CaseProperty;
+                Changeset.Remove(cPropBefore?.HtmlHeader + HttpUtility.HtmlEncode(cPropBefore?.Value));
+                if (cProp?.Value != null) Changeset.Add(cProp?.HtmlHeader + HttpUtility.HtmlEncode(cProp?.Value));
             }
             var e = new PropertyChangedEventArgs(propertyName);
             PropertyChanged?.Invoke(this, e);
