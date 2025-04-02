@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Fogger.Services
 {
-    public class HttpClientHelper : IHttpClient
+    public class HttpClientHelperV8 : IHttpClient
     {
         private readonly HttpClient _client = new HttpClient();
         private string _apiToken;

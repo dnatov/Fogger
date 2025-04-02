@@ -15,7 +15,7 @@ namespace Fogger.Services
         /*
          * ===========NOTE FOR IMPLEMENTATION====================
          *  The API documentation for editing cases can be found here:
-         *  https://support.fogbugz.com/hc/en-us/articles/360011343413-FogBugz-XML-API-Version-8#Sample_XML_Payloads
+         *  https://api.manuscript.com/
          *  The commands for resolve,close,email,reply and forward are all
          *  different versions of edit. I will not include these for now and
          *  let any application implementing this take care of it.
