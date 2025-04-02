@@ -8,7 +8,7 @@ namespace Fogger.Factories
         public static IHttpClient CreateHttpClient()
         {
             //TODO: Put version dependent HttpClient code here
-            return new HttpClientHelper();
+            return new HttpClientHelperV8();
         }
     }
 }
